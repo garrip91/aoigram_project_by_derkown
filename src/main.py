@@ -6,7 +6,7 @@ from aiogram.types import Message
 import logging
 import sqlite3
 
-from config import API_TOKEN, ADMIN
+from config import TOKEN, ADMIN
 
 
 
@@ -19,7 +19,7 @@ kb.add(types.InlineKeyboardButton(text="Статистика"))
 # Инициализируем проект:
 logging.basicConfig(level=logging.INFO)
 storage = MemoryStorage()
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=storage)
 
 # Создаём Базу Данных:
