@@ -6,9 +6,19 @@ from aiogram.types import Message
 import logging
 import sqlite3
 
-from config import TOKEN, ADMIN
+#from config import TOKEN, ADMIN
+import os
+import environ
+from pathlib import Path
 
 
+env = environ.Env(
+    # set casting, default value
+    ADMIN=(int, 0)
+)
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
 kb.add(types.InlineKeyboardButton(text="Рассылка"))
@@ -19,7 +29,7 @@ kb.add(types.InlineKeyboardButton(text="Статистика"))
 # Инициализируем проект:
 logging.basicConfig(level=logging.INFO)
 storage = MemoryStorage()
-bot = Bot(token=TOKEN)
+bot = Bot(token=env('TOKEN'))
 dp = Dispatcher(bot, storage=storage)
 
 # Создаём Базу Данных:
@@ -40,7 +50,7 @@ async def start(message: Message):
     cur = conn.cursor()
     cur.execute(f"SELECT block FROM users WHERE user_id = {message.chat.id}")
     result = cur.fetchone()
-    if message.from_user.id == ADMIN:
+    if message.from_user.id == env('ADMIN'):
         await message.answer('Добро пожаловать в Админ-Панель! Выберите действие на клавиатуре', reply_markup=kb)
     else:
         if result is None:
@@ -78,7 +88,7 @@ async def start_spam(message: Message, state: FSMContext):
 # Получаем пользователей из Базы и отправляем каждому сообщение:
 @dp.message_handler(content_types=['text'], text='Добавить в ЧС')
 async def hanadler(message: types.Message, state: FSMContext):
-    if message.chat.id == ADMIN:
+    if message.chat.id == env('ADMIN'):
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(types.InlineKeyboardButton(text="Назад"))
         await message.answer('Введите id пользователя, которого нужно заблокировать.\nДля отмены нажмите кнопку ниже', reply_markup=keyboard)
