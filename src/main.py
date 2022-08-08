@@ -7,7 +7,6 @@ import logging
 import sqlite3
 
 #from config import TOKEN, ADMIN
-import os
 import environ
 from pathlib import Path
 
